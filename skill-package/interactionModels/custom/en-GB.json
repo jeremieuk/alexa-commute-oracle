@@ -90,7 +90,9 @@
             }
           ],
           "samples": [
-            "{Choice}",
+            "I choose {Choice}",
+            "go with {Choice}",
+            "I'll take {Choice}",
             "the first one",
             "option {Choice}",
             "number {Choice}",
