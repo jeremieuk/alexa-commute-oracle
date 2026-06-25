@@ -8,25 +8,19 @@
           "description": "Commute Oracle tells you exactly when to step out the door to reach any destination in London on time. It checks live TfL data, surfaces disruptions, and suggests the fastest viable alternative when there are severe delays. Just ask 'when do I need to leave for King's Cross by 9?' and get a clear, actionable answer.",
           "examplePhrases": [
             "Alexa, open commute oracle",
-            "when do I need to leave for King's Cross by nine",
+            "when do I need to leave for Kings Cross by nine",
             "how do I get to Canary Wharf"
           ],
           "keywords": ["london", "commute", "tube", "tfl", "transport", "journey", "travel"]
         }
       },
       "isAvailableWorldwide": false,
-      "targetedRegions": ["UK"],
       "category": "NAVIGATION_AND_TRIP_PLANNER",
       "distributionCountries": ["GB"]
     },
     "apis": {
       "custom": {}
     },
-    "permissions": [
-      {
-        "name": "alexa::devices:all:address:country_and_postal_code:read"
-      }
-    ],
     "privacyAndCompliance": {
       "allowsPurchases": false,
       "containsAds": false,
@@ -39,13 +33,6 @@
           "termsOfUseUrl": ""
         }
       }
-    },
-    "events": {
-      "subscriptions": [
-        {
-          "eventName": "SKILL_DISABLED"
-        }
-      ]
     }
   }
 }
