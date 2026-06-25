@@ -1,0 +1,43 @@
+{
+  "journeys": [
+    {
+      "startDateTime": "2024-09-10T08:15:00",
+      "arrivalDateTime": "2024-09-10T08:47:00",
+      "duration": 32,
+      "legs": [
+        {
+          "duration": 5,
+          "instruction": { "summary": "Walk to Brixton Underground Station" },
+          "mode": { "name": "walking" },
+          "departurePoint": { "commonName": "your home" },
+          "arrivalPoint": { "commonName": "Brixton Underground Station" },
+          "disruptions": [],
+          "routeOptions": []
+        },
+        {
+          "duration": 22,
+          "instruction": { "summary": "Take Victoria line towards Walthamstow Central" },
+          "mode": { "name": "tube" },
+          "departurePoint": { "commonName": "Brixton Underground Station" },
+          "arrivalPoint": { "commonName": "King's Cross St. Pancras Underground Station" },
+          "disruptions": [],
+          "routeOptions": [
+            {
+              "name": "Victoria",
+              "lineStatuses": [{ "statusSeverity": 10, "statusSeverityDescription": "Good Service" }]
+            }
+          ]
+        },
+        {
+          "duration": 5,
+          "instruction": { "summary": "Walk to King's Cross" },
+          "mode": { "name": "walking" },
+          "departurePoint": { "commonName": "King's Cross St. Pancras Underground Station" },
+          "arrivalPoint": { "commonName": "King's Cross" },
+          "disruptions": [],
+          "routeOptions": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "commute oracle",
+      "intents": [
+        {
+          "name": "GetTravelTimeIntent",
+          "slots": [
+            {
+              "name": "Destination",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "how do I get to {Destination}",
+            "how long to {Destination}",
+            "how do I travel to {Destination}",
+            "what's the quickest way to {Destination}",
+            "get me to {Destination}",
+            "route to {Destination}",
+            "directions to {Destination}",
+            "travel to {Destination}",
+            "journey to {Destination}",
+            "how do I reach {Destination}",
+            "what trains go to {Destination}",
+            "what tube goes to {Destination}"
+          ]
+        },
+        {
+          "name": "GetLeaveTimeIntent",
+          "slots": [
+            {
+              "name": "Destination",
+              "type": "AMAZON.SearchQuery"
+            },
+            {
+              "name": "ArrivalTime",
+              "type": "AMAZON.TIME"
+            }
+          ],
+          "samples": [
+            "when do I need to leave for {Destination}",
+            "when should I leave to get to {Destination}",
+            "what time should I leave for {Destination}",
+            "I need to be at {Destination} by {ArrivalTime}",
+            "get me to {Destination} by {ArrivalTime}",
+            "I need to arrive at {Destination} by {ArrivalTime}",
+            "when do I need to leave to be at {Destination} by {ArrivalTime}",
+            "when do I need to go to reach {Destination} by {ArrivalTime}"
+          ]
+        },
+        {
+          "name": "SetHomeIntent",
+          "slots": [
+            {
+              "name": "HomeLocation",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "set my home to {HomeLocation}",
+            "my home is {HomeLocation}",
+            "I live at {HomeLocation}",
+            "I live near {HomeLocation}",
+            "my home station is {HomeLocation}",
+            "save my home as {HomeLocation}",
+            "change my home to {HomeLocation}",
+            "update my home to {HomeLocation}"
+          ]
+        },
+        {
+          "name": "DeleteHomeIntent",
+          "slots": [],
+          "samples": [
+            "delete my home",
+            "remove my home",
+            "forget my home",
+            "clear my home address",
+            "delete my saved address",
+            "remove my saved location"
+          ]
+        },
+        {
+          "name": "SelectChoiceIntent",
+          "slots": [
+            {
+              "name": "Choice",
+              "type": "AMAZON.SearchQuery"
+            }
+          ],
+          "samples": [
+            "{Choice}",
+            "the first one",
+            "option {Choice}",
+            "number {Choice}",
+            "the {Choice} one"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent"
+        },
+        {
+          "name": "AMAZON.CancelIntent"
+        },
+        {
+          "name": "AMAZON.StopIntent"
+        },
+        {
+          "name": "AMAZON.FallbackIntent"
+        },
+        {
+          "name": "AMAZON.YesIntent"
+        },
+        {
+          "name": "AMAZON.NoIntent"
+        }
+      ],
+      "types": []
+    }
+  }
+}

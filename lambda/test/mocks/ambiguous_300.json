@@ -1,0 +1,30 @@
+{
+  "toLocationDisambiguation": {
+    "disambiguationOptions": [
+      {
+        "matchedStop": {
+          "icsCode": "1000117",
+          "commonName": "Dishoom King's Cross",
+          "lat": 51.5308,
+          "lon": -0.1238
+        }
+      },
+      {
+        "matchedStop": {
+          "icsCode": "1000050",
+          "commonName": "Dishoom Covent Garden",
+          "lat": 51.5116,
+          "lon": -0.1226
+        }
+      },
+      {
+        "matchedStop": {
+          "icsCode": "1000055",
+          "commonName": "Dishoom Carnaby",
+          "lat": 51.5142,
+          "lon": -0.1395
+        }
+      }
+    ]
+  }
+}
