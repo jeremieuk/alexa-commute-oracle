@@ -38,12 +38,36 @@ npm test
 
 Alexa-hosted skills deploy via **git push** to CodeCommit — `ask deploy` is a no-op for hosted skills.
 
-1. Create a new Alexa-hosted skill in the Alexa Developer Console (Node.js runtime).
-2. Clone the provisioned CodeCommit repo.
-3. Copy this project's files into the clone.
-4. `git push` — the build pipeline deploys automatically.
+The live skill is `amzn1.ask.skill.59e49501-48bf-4840-97c1-453d46cec95c` (en-GB,
+development stage, Node 16). To deploy from a clean machine using the ASK CLI:
 
-To import the interaction model: Developer Console → Interaction Model → JSON Editor → paste `skill-package/interactionModels/custom/en-GB.json`.
+1. `ask configure --no-browser` (one Login-with-Amazon).
+2. `ask init --hosted-skill-id <skillId>` — clones the CodeCommit repo and wires the
+   git credential helper.
+3. Copy this project's `lambda/` + `skill-package/` into the clone, add the TfL key to
+   the clone's `lambda/config.js` (private repo only), and `git push origin master`.
+4. Watch the build: `ask smapi get-skill-status --skill-id <skillId>`.
+5. Enable for testing once: `ask smapi set-skill-enablement --skill-id <skillId> --stage development`.
+6. Test from the terminal: `ask smapi invoke-skill --skill-id <skillId> --endpoint-region EU --skill-request-body <json>`.
+
+**Non-obvious gotchas (all hit during the first deploy):**
+
+- **`ask-sdk-model` must be a direct dependency.** `ask-sdk-core` declares it only as a
+  `peerDependency`, and the hosted build's npm does not auto-install peers — without it
+  every request fails at runtime with `Cannot find module 'ask-sdk-model'`.
+- **Keep `lambda/` deploy-only.** No `devDependencies` (jest etc.), no `package-lock.json`,
+  no stray files (`util.js` requiring an undeclared `aws-sdk`) — these broke the hosted
+  build. Tests live in this source repo, not in the deployed Lambda.
+- **Manifest `permissions` and `targetedRegions` can't be set via SMAPI/git** (both 400 /
+  fail the build). The device-address permission must be toggled in the console
+  Permissions tab. Until then, do **not** emit an `AskForPermissionsConsent` card — Alexa
+  rejects any response requesting consent for an undeclared permission ("invalid response").
+  The skill is voice-set-home first and works without the permission.
+- **`jest@30` requires Node ≥18**; pin `jest@^29` for Node-16 parity if you run tests in
+  an environment matching the hosted runtime.
+
+To import the interaction model manually instead: Developer Console → Interaction Model →
+JSON Editor → paste `skill-package/interactionModels/custom/en-GB.json`.
 
 ### 5. Rotation note
 
