@@ -17,17 +17,6 @@ const LaunchRequestHandler = {
         .getResponse();
     }
 
-    if (origin.status === 'needsPermission') {
-      return handlerInput.responseBuilder
-        .speak(
-          "Welcome to Commute Oracle. To get your journey time I need permission to read your " +
-          "device address. Please check the Alexa app to grant access, or you can say " +
-          "'set my home to' followed by your postcode."
-        )
-        .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code'])
-        .getResponse();
-    }
-
     return handlerInput.responseBuilder
       .speak(
         "Commute Oracle is ready. Where are you heading, or what time do you need to arrive?"

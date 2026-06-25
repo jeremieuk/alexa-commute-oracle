@@ -1,5 +1,5 @@
 const { resolveOrigin } = require('../services/locationService');
-const { planJourney } = require('../services/tflService');
+const { planJourney, resolveStopPoint } = require('../services/tflService');
 const { filterJourneys } = require('../services/disruptionFilter');
 const { formatJourney } = require('../services/speechFormatter');
 
@@ -26,29 +26,18 @@ const GetTravelTimeIntentHandler = {
 
     // Resolve origin
     const originResult = await resolveOrigin(handlerInput);
-    if (originResult.status === 'needsPermission') {
-      return handlerInput.responseBuilder
-        .speak(
-          "I need permission to read your device address. Check the Alexa app to grant access, " +
-          "or say 'set my home to' followed by your postcode."
-        )
-        .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code'])
-        .getResponse();
-    }
     if (originResult.status === 'needsOnboarding') {
       return handlerInput.responseBuilder
         .speak("First I need to know where you're travelling from. What's your home postcode or nearest station?")
         .reprompt("What postcode or station should I use as your home?")
         .getResponse();
     }
-    if (originResult.status === 'error') {
-      return handlerInput.responseBuilder
-        .speak("Sorry, I couldn't determine your location. Please try again.")
-        .getResponse();
-    }
 
     const from = originResult.origin;
-    const journey = await planJourney({ from, to: destination });
+    // Prefer a canonical TfL stop for the destination (clean, no disambiguation);
+    // fall back to free-text geocoding, which may disambiguate (e.g. a POI name).
+    const destStop = await resolveStopPoint(destination);
+    const journey = await planJourney({ from, to: destStop ? destStop.coordinate : destination });
 
     if (journey.status === 'ambiguous') {
       return handleAmbiguous(handlerInput, journey, from, destination);

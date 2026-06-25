@@ -23,7 +23,7 @@ const SetHomeIntentHandler = {
 
     if (result.status === 'ok') {
       return handlerInput.responseBuilder
-        .speak(`Got it, I've saved ${location} as your home. You can now ask me when to leave for any destination.`)
+        .speak(`Got it, I've saved ${result.name || location} as your home. You can now ask me when to leave for any destination.`)
         .getResponse();
     }
 

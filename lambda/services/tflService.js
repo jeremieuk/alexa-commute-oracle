@@ -49,6 +49,37 @@ async function planJourney({ from, to, arriveBy, date }) {
   return { status: 'ok', journeys };
 }
 
+// Modes considered when resolving a spoken place name to a TfL stop.
+const TFL_STOP_MODES = 'tube,dlr,overground,elizabeth-line,national-rail,tram';
+
+/**
+ * Resolve a free-text place/station name to a single TfL stop via StopPoint
+ * search. Returns the stop's coordinate (which always plans journeys cleanly)
+ * plus its canonical display name, or null if nothing matches.
+ *
+ * @param {string} query
+ * @returns {Promise<{ coordinate: string, name: string } | null>}
+ */
+async function resolveStopPoint(query) {
+  const params = new URLSearchParams({ app_key: TFL_APP_KEY, modes: TFL_STOP_MODES });
+  const url = `/StopPoint/Search/${encodeURIComponent(query)}?${params}`;
+
+  let response;
+  try {
+    response = await httpClient.get(url);
+  } catch (err) {
+    return null;
+  }
+
+  const matches = response.data && response.data.matches;
+  if (!matches || matches.length === 0) return null;
+
+  const top = matches[0];
+  if (typeof top.lat !== 'number' || typeof top.lon !== 'number') return null;
+
+  return { coordinate: `${top.lat},${top.lon}`, name: top.name };
+}
+
 function parseDisambiguation(data) {
   const fromOpts = data.fromLocationDisambiguation
     ? data.fromLocationDisambiguation.disambiguationOptions
@@ -66,4 +97,4 @@ function parseDisambiguation(data) {
   };
 }
 
-module.exports = { planJourney };
+module.exports = { planJourney, resolveStopPoint };

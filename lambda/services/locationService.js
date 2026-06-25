@@ -1,20 +1,28 @@
-const { planJourney } = require('./tflService');
+const { planJourney, resolveStopPoint } = require('./tflService');
 
-const HOME_ATTRIBUTE = 'homePostcode';
+const HOME_ATTRIBUTE = 'homePostcode'; // stores a postcode or a "lat,lon" coordinate
+const HOME_NAME_ATTRIBUTE = 'homeName'; // human-friendly display name for confirmations
+
+// A stable, unambiguous point used only to probe whether a free-text location
+// geocodes to a plannable journey (full postcodes resolve directly).
+const CENTRAL_LONDON = '51.5074,-0.1278';
 
 /**
  * Resolve the user's origin for a journey.
  *
+ * Voice set-home is the PRIMARY onboarding path. We do NOT request the Device
+ * Address API / emit a permissions consent card here, because the device-address
+ * permission is not declared in the skill manifest (it is enabled separately via
+ * the console Permissions tab). Emitting a consent card for an undeclared
+ * permission makes Alexa reject the whole response as invalid.
+ *
  * Resolution order:
  *   1. Persisted home postcode (DynamoDB via persistent attributes)
- *   2. Device Address API (country_and_postal_code scope)
- *   3. Neither → return { status: 'needsOnboarding' }
+ *   2. None → { status: 'needsOnboarding' } so the flow runs a spoken set-home dialog
  *
  * @returns {Promise<
  *   | { status: 'ok', origin: string }
- *   | { status: 'needsPermission' }
  *   | { status: 'needsOnboarding' }
- *   | { status: 'error', message: string }
  * >}
  */
 async function resolveOrigin(handlerInput) {
@@ -25,53 +33,61 @@ async function resolveOrigin(handlerInput) {
       return { status: 'ok', origin: attrs[HOME_ATTRIBUTE] };
     }
   } catch (_) {
-    // persistence unavailable locally — continue
+    // persistence unavailable — treat as no home set, fall through to onboarding
   }
 
-  // 2. Device Address API
-  const { requestEnvelope, serviceClientFactory } = handlerInput;
-  if (!serviceClientFactory) {
-    return { status: 'needsOnboarding' };
-  }
-
-  try {
-    const deviceId = requestEnvelope.context.System.device.deviceId;
-    const client = serviceClientFactory.getDeviceAddressServiceClient();
-    const address = await client.getCountryAndPostalCode(deviceId);
-
-    if (address && address.postalCode) {
-      return { status: 'ok', origin: address.postalCode };
-    }
-    // Consent granted but no address registered
-    return { status: 'needsOnboarding' };
-  } catch (err) {
-    const code = err.statusCode || (err.response && err.response.status);
-    if (code === 403) return { status: 'needsPermission' };
-    return { status: 'error', message: err.message || 'address_lookup_failed' };
-  }
+  // 2. No persisted home → voice onboarding (primary path).
+  return { status: 'needsOnboarding' };
 }
 
 /**
- * Validate a postcode/place via TfL (by using it as a from- origin to itself)
- * and persist it if valid.
+ * Resolve a spoken home location to something TfL can plan from, then persist it.
  *
- * @returns {Promise<{ status: 'ok' } | { status: 'invalid' } | { status: 'error', message: string }>}
+ * Resolution:
+ *   1. StopPoint search — named stations/places resolve to a canonical stop; we
+ *      store its coordinate (which always plans cleanly) and display name.
+ *   2. Direct geocode probe — full postcodes plan straight to a journey; store
+ *      the raw postcode.
+ *   3. Neither → invalid (rejects garbage, which matches no stop and no journey).
+ *
+ * @returns {Promise<
+ *   | { status: 'ok', name: string }
+ *   | { status: 'invalid' }
+ *   | { status: 'error', message: string }
+ * >}
  */
 async function setHome(handlerInput, location) {
-  const result = await planJourney({ from: location, to: location });
-  // TfL returns no_results or ambiguous if from is unrecognised
-  if (result.status === 'error') return result;
-  if (result.status === 'no_results') return { status: 'invalid' };
+  let homeValue = null;
+  let homeName = location;
+
+  // 1. Named station / place → canonical stop coordinate
+  const stop = await resolveStopPoint(location);
+  if (stop) {
+    homeValue = stop.coordinate;
+    homeName = stop.name;
+  } else {
+    // 2. Fall back to a direct geocode probe (full postcodes resolve here)
+    const probe = await planJourney({ from: location, to: CENTRAL_LONDON });
+    if (probe.status === 'error') return probe;
+    if (probe.status === 'ok') {
+      homeValue = location;
+      homeName = location;
+    }
+  }
+
+  // 3. Unrecognised
+  if (!homeValue) return { status: 'invalid' };
 
   try {
     const attrs = await handlerInput.attributesManager.getPersistentAttributes();
-    attrs[HOME_ATTRIBUTE] = location;
+    attrs[HOME_ATTRIBUTE] = homeValue;
+    attrs[HOME_NAME_ATTRIBUTE] = homeName;
     handlerInput.attributesManager.setPersistentAttributes(attrs);
     await handlerInput.attributesManager.savePersistentAttributes();
   } catch (err) {
     return { status: 'error', message: 'persistence_failed' };
   }
-  return { status: 'ok' };
+  return { status: 'ok', name: homeName };
 }
 
 /**
@@ -81,9 +97,10 @@ async function deleteHome(handlerInput) {
   try {
     const attrs = await handlerInput.attributesManager.getPersistentAttributes();
     delete attrs[HOME_ATTRIBUTE];
+    delete attrs[HOME_NAME_ATTRIBUTE];
     handlerInput.attributesManager.setPersistentAttributes(attrs);
     await handlerInput.attributesManager.savePersistentAttributes();
   } catch (_) {}
 }
 
-module.exports = { resolveOrigin, setHome, deleteHome, HOME_ATTRIBUTE };
+module.exports = { resolveOrigin, setHome, deleteHome, HOME_ATTRIBUTE, HOME_NAME_ATTRIBUTE };

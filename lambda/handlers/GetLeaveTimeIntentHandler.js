@@ -1,5 +1,5 @@
 const { resolveOrigin } = require('../services/locationService');
-const { planJourney } = require('../services/tflService');
+const { planJourney, resolveStopPoint } = require('../services/tflService');
 const { filterJourneys } = require('../services/disruptionFilter');
 const { formatJourney } = require('../services/speechFormatter');
 
@@ -33,24 +33,17 @@ const GetLeaveTimeIntentHandler = {
     }
 
     const originResult = await resolveOrigin(handlerInput);
-    if (originResult.status === 'needsPermission') {
-      return handlerInput.responseBuilder
-        .speak(
-          "I need permission to read your device address. Check the Alexa app, " +
-          "or say 'set my home to' followed by your postcode."
-        )
-        .withAskForPermissionsConsentCard(['read::alexa:device:all:address:country_and_postal_code'])
-        .getResponse();
-    }
     if (originResult.status !== 'ok') {
       return handlerInput.responseBuilder
         .speak("First, tell me your home by saying 'set my home to' followed by your postcode.")
         .getResponse();
     }
 
+    // Prefer a canonical TfL stop for the destination; fall back to free-text geocoding.
+    const destStop = await resolveStopPoint(destination);
     const journey = await planJourney({
       from: originResult.origin,
-      to: destination,
+      to: destStop ? destStop.coordinate : destination,
       arriveBy: arrivalTimeRaw,
     });
 
