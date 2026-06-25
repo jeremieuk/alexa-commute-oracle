@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:developer.amazon.com)",
+      "WebFetch(domain:techforum.tfl.gov.uk)",
+      "WebFetch(domain:alexaskillstutorials.com)",
+      "WebFetch(domain:api.tfl.gov.uk)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:forums.developer.amazon.com)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://registry.npmjs.org/@ask-sdk%2Fdynamodb-persistence-adapter\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://registry.npmjs.org/ask-sdk-dynamodb-persistence-adapter\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://registry.npmjs.org/@ask-sdk%2Fcore\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" \"https://registry.npmjs.org/ask-sdk-core\")",
+      "Bash(curl -s \"https://registry.npmjs.org/ask-sdk-dynamodb-persistence-adapter\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); lv=d['dist-tags']['latest']; v=d['versions'][lv]; print\\('name:',d['name']\\); print\\('latest:',lv\\); print\\('peerDependencies:',json.dumps\\(v.get\\('peerDependencies',{}\\)\\)\\); print\\('dependencies:',json.dumps\\(v.get\\('dependencies',{}\\)\\)\\)\")",
+      "Bash(curl -s \"https://registry.npmjs.org/@ask-sdk%2Fdynamodb-persistence-adapter\")",
+      "Bash(curl -s \"https://registry.npmjs.org/@ask-sdk%2Fcore\")",
+      "WebFetch(domain:axios-http.com)",
+      "WebFetch(domain:axios.rest)",
+      "WebFetch(domain:ask-sdk-for-nodejs.readthedocs.io)",
+      "Read(//home/jeremie/.claude/jobs/dd41dffc/tmp/**)",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}
