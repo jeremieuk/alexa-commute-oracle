@@ -42,11 +42,12 @@
             "when do I need to leave for {Destination}",
             "when should I leave to get to {Destination}",
             "what time should I leave for {Destination}",
-            "I need to be at {Destination} by {ArrivalTime}",
-            "get me to {Destination} by {ArrivalTime}",
-            "I need to arrive at {Destination} by {ArrivalTime}",
-            "when do I need to leave to be at {Destination} by {ArrivalTime}",
-            "when do I need to go to reach {Destination} by {ArrivalTime}"
+            "when do I leave for {Destination}",
+            "how early should I leave for {Destination}",
+            "by {ArrivalTime}",
+            "I need to arrive by {ArrivalTime}",
+            "I need to be there by {ArrivalTime}",
+            "arriving by {ArrivalTime}"
           ]
         },
         {
